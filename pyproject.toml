@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "safety-gear-detection-claude"
+version = "0.1.0"
+description = "Yolov11 project for detecting safety gear."
+authors = ["amanroland@gmail.com"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+ultralytics = "^8.3.228"
+opencv-python-headless = "^4.12.0"
+pyyaml = "^6.0.3"
+scikit-learn = "^1.7.2"
+pandas = "^2.3.3"
+matplotlib = "^3.10.7"
+tqdm = "^4.67.1"
+rich = "^14.2.0"
+pillow = "^12.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ruff = "^0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
