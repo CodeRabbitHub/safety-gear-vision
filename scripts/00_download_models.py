@@ -13,13 +13,13 @@ sys.path.insert(0, str(project_root))
 
 from src.utils.logger import get_logger
 
-# YOLOv8 model URLs
+# YOLOv11 model URLs
 YOLO_URLS = {
-    'yolov8n.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt',
-    'yolov8s.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8s.pt',
-    'yolov8m.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8m.pt',
-    'yolov8l.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8l.pt',
-    'yolov8x.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8x.pt',
+    'yolov11n.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt',
+    'yolov11s.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s.pt',
+    'yolov11m.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m.pt',
+    'yolov11l.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l.pt',
+    'yolov11x.pt': 'https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x.pt',
 }
 
 
@@ -74,27 +74,27 @@ def main():
     print("="*70)
     print(f"Models will be stored in: {models_dir}\n")
     
-    # Download YOLOv8 models (stable, working versions)
-    yolov8_models = [
-        'yolov8n.pt',   # Nano - fastest, lowest accuracy
-        'yolov8s.pt',   # Small - balanced
-        'yolov8m.pt',   # Medium
-        'yolov8l.pt',   # Large
-        'yolov8x.pt',   # Extra Large - slowest, highest accuracy
+    # Download YOLOv11 models (latest)
+    yolov11_models = [
+        'yolov11n.pt',   # Nano - fastest, lowest accuracy
+        'yolov11s.pt',   # Small - balanced
+        'yolov11m.pt',   # Medium
+        'yolov11l.pt',   # Large
+        'yolov11x.pt',   # Extra Large - slowest, highest accuracy
     ]
     
-    print("Available YOLOv8 models:")
-    for i, model in enumerate(yolov8_models, 1):
+    print("Available YOLOv11 models:")
+    for i, model in enumerate(yolov11_models, 1):
         print(f"  {i}. {model}")
     
     print("\n" + "-"*70)
-    print("Downloading YOLOv8 models (this may take several minutes)...")
+    print("Downloading YOLOv11 models (this may take several minutes)...")
     print("-"*70)
     
     success_count = 0
-    total_count = len(yolov8_models)
+    total_count = len(yolov11_models)
     
-    for model in yolov8_models:
+    for model in yolov11_models:
         if download_model(model, models_dir):
             success_count += 1
     
