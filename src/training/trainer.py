@@ -34,6 +34,9 @@ class YOLOTrainer:
         self.config_manager = ConfigManager(config_path)
         self.config = self.config_manager.to_dict()
         
+        # Get project root
+        self.project_root = Path(__file__).parent.parent.parent
+        
         # Generate experiment name if not provided
         if experiment_name is None:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -88,11 +91,20 @@ class YOLOTrainer:
             self.logger.info(f"Using GPU: {gpu_info['devices'][0]['name']}")
         
         # Initialize model
-        model_weights = self.config.get('model', 'yolov11n.pt')
+        model_weights = self.config.get('model', 'yolov8s.pt')
         self.logger.info(f"Loading model: {model_weights}")
         
+        # Check if model exists in models/pretrained directory
+        pretrained_model = self.project_root / 'models' / 'pretrained' / model_weights
+        
         try:
-            self.model = YOLO(model_weights)
+            if pretrained_model.exists():
+                self.logger.info(f"Loading from local pretrained models: {pretrained_model}")
+                self.model = YOLO(str(pretrained_model))
+            else:
+                # Fall back to Ultralytics auto-download
+                self.logger.info(f"Model not found in {pretrained_model}, attempting to download...")
+                self.model = YOLO(model_weights)
         except Exception as e:
             self.logger.error(f"Failed to load model: {e}")
             raise

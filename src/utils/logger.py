@@ -85,7 +85,14 @@ class StructuredLogger:
     def _format_message(message: str, data: dict) -> str:
         """Format message with structured data."""
         if data:
-            return f"{message} | {json.dumps(data)}"
+            # Convert Path objects to strings for JSON serialization
+            serializable_data = {}
+            for key, value in data.items():
+                if isinstance(value, Path):
+                    serializable_data[key] = str(value)
+                else:
+                    serializable_data[key] = value
+            return f"{message} | {json.dumps(serializable_data)}"
         return message
 
 

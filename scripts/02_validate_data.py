@@ -33,7 +33,7 @@ def main():
     parser.add_argument(
         '--num-classes',
         type=int,
-        default=4,
+        default=17,
         help='Number of classes'
     )
     
