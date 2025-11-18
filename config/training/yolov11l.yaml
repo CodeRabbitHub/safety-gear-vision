@@ -1,0 +1,52 @@
+# YOLOv11 Large - Training Configuration
+# Higher accuracy for production on Tesla T4
+
+# Model
+model: yolov11l.pt  # Pretrained weights
+imgsz: 640
+
+# Training hyperparameters
+epochs: 200
+batch: 12           # Large: batch 12, lr0: 0.001875
+workers: 8
+device: 0
+
+# Optimizer
+optimizer: AdamW
+lr0: 0.001875
+lrf: 0.01
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 5
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Loss
+box: 7.5
+cls: 0.5
+dfl: 1.5
+
+# Data augmentation
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 10.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+perspective: 0.0003
+flipud: 0.0
+fliplr: 0.5
+mosaic: 1.0
+mixup: 0.15
+copy_paste: 0.0
+
+# Training settings
+patience: 50
+save_period: -1
+amp: true
+deterministic: false
+single_cls: false
+rect: false
+cos_lr: true
+close_mosaic: 10
