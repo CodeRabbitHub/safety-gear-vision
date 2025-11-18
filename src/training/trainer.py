@@ -189,13 +189,16 @@ class YOLOTrainer:
         **kwargs
     ) -> Dict:
         """Prepare training parameters from config and arguments."""
+        # Use logs/tensorboard as default project directory for TensorBoard integration
+        default_project = self.project_root / 'logs' / 'tensorboard'
+        
         params = {
             'data': str(data_yaml),
             'epochs': epochs or self.config.get('epochs', 100),
             'batch': batch_size or self.config.get('batch', 16),
             'imgsz': imgsz or self.config.get('imgsz', 640),
             'device': device or self.config.get('device', '0'),
-            'project': project or 'runs/detect',  # Use standard YOLO runs directory
+            'project': str(project or default_project),  # Use logs/tensorboard for TensorBoard integration
             'name': self.experiment_name,
             'exist_ok': True,
             'pretrained': True,
