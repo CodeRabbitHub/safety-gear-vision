@@ -45,6 +45,10 @@ class YOLOTrainer:
         self.experiment_name = experiment_name
         self.logger = logger or get_logger('yolo_trainer')
         
+        # Initialize TensorBoard directory
+        self.tensorboard_dir = self.project_root / 'logs' / 'tensorboard' / self.experiment_name
+        self.tensorboard_dir.mkdir(parents=True, exist_ok=True)
+        
         # Initialize model
         self.model = None
         self.best_model_path = None
@@ -111,20 +115,26 @@ class YOLOTrainer:
         
         # Start training
         self.logger.info("Starting training...")
+        
         try:
             results = self.model.train(**train_params)
             
-            # Get best model path
+            # Get best model path and TensorBoard logs location
             self.best_model_path = Path(results.save_dir) / 'weights' / 'best.pt'
+            tensorboard_logs_dir = Path(results.save_dir)
             
             self.logger.info(f"Training complete!")
             self.logger.info(f"Best model saved to: {self.best_model_path}")
+            self.logger.info(f"TensorBoard logs saved to: {tensorboard_logs_dir}")
+            self.logger.info(f"To view training metrics with TensorBoard, run:")
+            self.logger.info(f"  tensorboard --logdir {tensorboard_logs_dir} --port 6006")
             
             # Compile results
             training_results = {
                 'experiment_name': self.experiment_name,
                 'best_model_path': str(self.best_model_path),
                 'save_dir': str(results.save_dir),
+                'tensorboard_dir': str(self.tensorboard_dir),
                 'config': train_params
             }
             
@@ -185,7 +195,7 @@ class YOLOTrainer:
             'batch': batch_size or self.config.get('batch', 16),
             'imgsz': imgsz or self.config.get('imgsz', 640),
             'device': device or self.config.get('device', '0'),
-            'project': project or 'models/checkpoints',
+            'project': project or 'runs/detect',  # Use standard YOLO runs directory
             'name': self.experiment_name,
             'exist_ok': True,
             'pretrained': True,
