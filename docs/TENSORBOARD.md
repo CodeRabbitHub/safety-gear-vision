@@ -14,7 +14,7 @@ Training will automatically log metrics to `logs/tensorboard/exp_TIMESTAMP/`
 ### 2. Launch TensorBoard
 In a new terminal, run:
 ```bash
-poetry run python scripts/10_tensorboard.py
+poetry run python scripts/09_tensorboard.py
 ```
 
 ### 3. View Metrics
