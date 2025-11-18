@@ -9,7 +9,7 @@ imgsz: 640
 epochs: 200
 batch: 24           # or 32
 workers: 8
-device: cpu
+device: 0
 
 # Optimizer
 optimizer: AdamW

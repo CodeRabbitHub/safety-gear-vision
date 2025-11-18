@@ -9,7 +9,7 @@ TensorBoard visualization is now integrated into the training pipeline for monit
 poetry run python scripts/05_train.py
 ```
 
-Training will automatically log metrics to `logs/tensorboard/exp_TIMESTAMP/`
+Training will automatically log metrics to `logs/tensorboard/{experiment_name}/events.out.tfevents.*`
 
 ### 2. Launch TensorBoard
 In a new terminal, run:
@@ -51,16 +51,27 @@ TensorBoard automatically aggregates all experiments. You can:
 
 ## Directory Structure
 
+Training logs are automatically organized by experiment name:
+
 ```
 logs/
-├── tensorboard/
-│   ├── exp_20251117_212154/
-│   │   └── events.out.tfevents.*
-│   ├── exp_20251117_213000/
-│   │   └── events.out.tfevents.*
-│   └── ...
-└── training_logs/
+└── tensorboard/
+    ├── exp_20251117_212154/
+    │   ├── events.out.tfevents.*
+    │   ├── weights/
+    │   │   ├── best.pt
+    │   │   └── last.pt
+    │   └── args.yaml
+    ├── exp_20251117_213000/
+    │   ├── events.out.tfevents.*
+    │   ├── weights/
+    │   │   ├── best.pt
+    │   │   └── last.pt
+    │   └── args.yaml
+    └── ...
 ```
+
+The `setup_project.py` script creates the `logs/` directory. The `logs/tensorboard/` subdirectory and experiment folders are created automatically during training.
 
 ## Stopping TensorBoard
 

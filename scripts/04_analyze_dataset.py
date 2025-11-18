@@ -21,14 +21,27 @@ def main():
     parser.add_argument(
         '--image-dir',
         type=str,
-        default='data/raw/images',
-        help='Directory containing images'
+        default=None,
+        help='Directory containing images (auto-detects raw or processed)'
     )
     parser.add_argument(
         '--label-dir',
         type=str,
-        default='data/raw/labels',
-        help='Directory containing labels'
+        default=None,
+        help='Directory containing labels (auto-detects raw or processed)'
+    )
+    parser.add_argument(
+        '--processed',
+        action='store_true',
+        default=False,
+        help='Analyze processed/split dataset instead of raw'
+    )
+    parser.add_argument(
+        '--split',
+        type=str,
+        default='train',
+        choices=['train', 'val', 'test'],
+        help='Which split to analyze (only for processed dataset)'
     )
     parser.add_argument(
         '--output-dir',
@@ -39,9 +52,25 @@ def main():
     
     args = parser.parse_args()
     
-    # Setup paths
-    image_dir = project_root / args.image_dir
-    label_dir = project_root / args.label_dir
+    # Auto-detect data location if not specified
+    if args.image_dir is None:
+        if args.processed:
+            image_dir = project_root / 'data' / 'processed' / 'images' / args.split
+            label_dir = project_root / 'data' / 'processed' / 'labels' / args.split
+        else:
+            # Check if raw data exists, otherwise try processed
+            raw_image_dir = project_root / 'data' / 'raw' / 'images'
+            if raw_image_dir.exists():
+                image_dir = raw_image_dir
+                label_dir = project_root / 'data' / 'raw' / 'labels'
+            else:
+                # Default to processed train split
+                image_dir = project_root / 'data' / 'processed' / 'images' / 'train'
+                label_dir = project_root / 'data' / 'processed' / 'labels' / 'train'
+    else:
+        image_dir = project_root / args.image_dir
+        label_dir = project_root / (args.label_dir or args.image_dir.replace('images', 'labels'))
+    
     output_dir = project_root / args.output_dir
     
     # Initialize logger
