@@ -4,12 +4,25 @@ A production-grade computer vision system for detecting Personal Protective Equi
 
 ## 🎯 Project Overview
 
-This system detects and classifies people based on their safety equipment compliance in images:
+This system detects and classifies people and PPE items using the project's 17 safety-gear classes (see `data/processed/dataset.yaml`):
 
-- **Class 0**: Person with helmet AND PPE (✅ Fully compliant)
-- **Class 1**: Person with helmet ONLY (⚠️ Partially compliant)
-- **Class 2**: Person with PPE ONLY (⚠️ Partially compliant)
-- **Class 3**: Person without safety gear (❌ Non-compliant)
+- `0` : Person
+- `1` : Head
+- `2` : Face
+- `3` : Glasses
+- `4` : Face-Mask-Medical
+- `5` : Face-Shield
+- `6` : Ear
+- `7` : Earmuffs
+- `8` : Hands
+- `9` : Gloves
+- `10`: Foot
+- `11`: Shoes
+- `12`: Safety-Vest
+- `13`: Tools
+- `14`: Helmet
+- `15`: Medical-Suit
+- `16`: Safety-Suit
 
 ## 📋 Features
 
@@ -27,18 +40,17 @@ This system detects and classifies people based on their safety equipment compli
 
 ### 1. Environment Setup
 
+This project uses `poetry` for dependency and virtual environment management. Recommended steps:
+
 ```bash
-# Activate conda environment
-conda activate yolo
+# Install poetry if you don't have it
+# pip install poetry
 
-# Install dependencies
-pip install ultralytics pyyaml pillow opencv-python matplotlib seaborn tqdm numpy
+# Install project dependencies and create virtualenv
+poetry install
 
-# Clone/navigate to project
-cd ~/projects/safety-gear-detection
-
-# Initialize project structure
-python scripts/01_setup_project.py
+# Initialize project structure (creates logs, models, results folders etc.)
+poetry run python scripts/01_setup_project.py
 ```
 
 ### 2. Prepare Data
@@ -60,45 +72,60 @@ python scripts/03_prepare_dataset.py
 
 ### 3. Train Model
 
-```bash
-# Start training (in tmux session)
-tmux new -s yolo-training
+Recommended workflow (use `poetry run` to execute scripts inside the project virtualenv):
 
-python scripts/05_train.py \
+```bash
+# 1) Download pretrained YOLO weights into `models/pretrained/` (required)
+poetry run python scripts/00_download_models.py
+
+# 2) Start training (example uses the small model config)
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --experiment-name safety_gear_v1 \
     --epochs 200 \
     --batch-size 16 \
     --device 0
 
-# Detach: Ctrl+b, then d
-# Reattach: tmux attach -t yolo-training
+# Optional: run inside tmux/screen if training remotely
 ```
+
+Notes:
+- The trainer expects pretrained weights in `models/pretrained/` (script `00_download_models.py` places them there).
+- Training logs and checkpoints are written to `logs/tensorboard/{experiment_name}/` by default. The best model is saved at `logs/tensorboard/{experiment_name}/weights/best.pt`.
+- AMP (automatic mixed precision) is disabled by default in configs to avoid an automatic AMP check that downloads a small model; enable `amp: true` in your chosen config if you explicitly want AMP.
 
 ### 4. Evaluate Model
 
+Example (use the `best.pt` produced by training):
+
 ```bash
-python scripts/06_evaluate.py \
-    --weights models/checkpoints/safety_gear_v1/weights/best.pt \
+poetry run python scripts/06_evaluate.py \
+    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
     --data data/processed/dataset.yaml
 ```
 
+If you don't know the exact experiment name, list the `logs/tensorboard/` folder and pick the latest experiment.
+
 ### 5. Run Inference
+
+Run inference with a trained model (point `--weights` to the `best.pt` saved by training):
 
 ```bash
 # Single image
-python scripts/07_inference.py \
-    --weights models/checkpoints/safety_gear_v1/weights/best.pt \
+poetry run python scripts/07_inference.py \
+    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
     --source path/to/image.jpg \
     --save-results
 
 # Batch processing
-python scripts/07_inference.py \
-    --weights models/checkpoints/safety_gear_v1/weights/best.pt \
+poetry run python scripts/07_inference.py \
+    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
     --source path/to/images/ \
     --save-results \
     --save-json
 ```
+
+The inference script will save annotated images (if `--save-results`) to `results/predictions/` by default and can also output JSON when requested.
 
 ## 📁 Project Structure
 
@@ -152,14 +179,15 @@ Edit `config/training/yolov11s.yaml` to adjust:
 
 ### TensorBoard
 
+Start TensorBoard pointing it at the `logs/tensorboard/` directory:
+
 ```bash
-# Forward port via SSH
-ssh -L 6006:localhost:6006 user@remote
+# Run locally on the machine where training produced logs
+poetry run python scripts/09_tensorboard.py
+# or use tensorboard directly
+tensorboard --logdir logs/tensorboard --port 6006
 
-# On remote machine
-tensorboard --logdir models/checkpoints --port 6006
-
-# Access at: http://localhost:6006
+# If remote, forward port and open browser at http://localhost:6006
 ```
 
 ### GPU Monitoring
@@ -174,10 +202,10 @@ nvtop
 
 ## 📈 Performance
 
-Typical metrics on safety gear dataset:
-- **mAP@0.5**: ~0.85-0.92
-- **Inference speed**: 30-50 FPS (T4 GPU)
-- **Model size**: 10-25 MB (depending on variant)
+Typical metrics will vary by model variant and dataset split. Example ranges:
+- **mAP@0.5**: dataset-dependent (often 0.70+ for initial runs)
+- **Inference speed**: depends on GPU (Tesla T4 ~30-50 FPS for small models)
+- **Model size**: varies by variant (small/medium/large)
 
 ## 🛠️ Troubleshooting
 
