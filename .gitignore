@@ -212,9 +212,11 @@ data/*
 models/*
 results/*
 logs/*
+runs/*
 
 # But DO NOT ignore the folder itself
 !data/.gitkeep
 !models/.gitkeep
 !results/.gitkeep
 !logs/.gitkeep
+!runs/.gitkeep

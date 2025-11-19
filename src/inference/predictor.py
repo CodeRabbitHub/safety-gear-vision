@@ -17,19 +17,50 @@ from ..utils.model_utils import ModelUtils
 class YOLOPredictor:
     """Handles inference with trained YOLO models."""
     
-    # Class names and colors
+    # 17 safety gear classes from dataset.yaml
     CLASS_NAMES = {
-        0: "person-with-helmet-and-ppe",
-        1: "person-with-helmet-only",
-        2: "person-with-ppe-only",
-        3: "person-without-safety-gear"
+        0: "Person",
+        1: "Head",
+        2: "Face",
+        3: "Glasses",
+        4: "Face-Mask-Medical",
+        5: "Face-Shield",
+        6: "Ear",
+        7: "Earmuffs",
+        8: "Hands",
+        9: "Gloves",
+        10: "Foot",
+        11: "Shoes",
+        12: "Safety-Vest",
+        13: "Tools",
+        14: "Helmet",
+        15: "Medical-Suit",
+        16: "Safety-Suit"
     }
     
+    # Color mapping for visualization (BGR format)
+    # Person-related: Blue/Purple tones
+    # Head/Face-related: Cyan/Green tones
+    # Body Protection: Orange/Yellow tones
+    # Foot Protection: Red/Pink tones
     CLASS_COLORS = {
-        0: (0, 255, 0),      # Green - Safe
-        1: (0, 165, 255),    # Orange - Partial
-        2: (0, 165, 255),    # Orange - Partial
-        3: (0, 0, 255)       # Red - Unsafe
+        0: (200, 100, 0),      # Person - Dark Blue
+        1: (255, 200, 0),      # Head - Light Blue
+        2: (0, 255, 255),      # Face - Cyan
+        3: (0, 255, 0),        # Glasses - Green
+        4: (0, 255, 100),      # Face-Mask - Green-Cyan
+        5: (100, 255, 0),      # Face-Shield - Yellow-Green
+        6: (255, 255, 0),      # Ear - Cyan-Yellow
+        7: (0, 165, 255),      # Earmuffs - Orange
+        8: (0, 100, 255),      # Hands - Orange-Red
+        9: (0, 0, 255),        # Gloves - Red
+        10: (255, 0, 255),     # Foot - Magenta
+        11: (255, 0, 200),     # Shoes - Pink-Magenta
+        12: (0, 165, 255),     # Safety-Vest - Orange
+        13: (100, 100, 255),   # Tools - Light Red
+        14: (0, 255, 0),       # Helmet - Bright Green
+        15: (100, 255, 100),   # Medical-Suit - Light Green
+        16: (0, 200, 100)      # Safety-Suit - Green-Cyan
     }
     
     def __init__(
