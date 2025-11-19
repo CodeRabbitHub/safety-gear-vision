@@ -73,18 +73,38 @@ class ModelUtils:
             device_id: Device specification (0, 'cuda', 'cpu', etc.)
         
         Returns:
-            Device string
+            Device string ('cuda:0', 'cuda:1', 'cpu', etc.)
         """
         if device_id is None:
-            return '0' if torch.cuda.is_available() else 'cpu'
+            return 'cuda:0' if torch.cuda.is_available() else 'cpu'
         
+        # If integer, convert to cuda device format
         if isinstance(device_id, int):
-            if torch.cuda.is_available():
-                return str(device_id)
+            if torch.cuda.is_available() and device_id < torch.cuda.device_count():
+                return f'cuda:{device_id}'
             else:
                 return 'cpu'
         
-        return device_id
+        # If string, normalize it
+        device_str = str(device_id).lower()
+        
+        # If it's just a number, convert to cuda format
+        if device_str.isdigit():
+            device_num = int(device_str)
+            if torch.cuda.is_available() and device_num < torch.cuda.device_count():
+                return f'cuda:{device_num}'
+            else:
+                return 'cpu'
+        
+        # If it's already 'cuda:X' or 'cpu', return as is
+        if device_str.startswith('cuda:') or device_str == 'cpu':
+            return device_str
+        
+        # If it's 'cuda', add default device number
+        if device_str == 'cuda':
+            return 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        
+        return 'cpu'
     
     @staticmethod
     def check_gpu_availability() -> dict:

@@ -18,11 +18,25 @@ from ..utils.file_handler import FileHandler
 class ModelEvaluator:
     """Evaluates YOLO model performance on test data."""
     
+    # 17 safety gear classes from dataset.yaml
     CLASS_NAMES = {
-        0: "helmet-and-ppe",
-        1: "helmet-only",
-        2: "ppe-only",
-        3: "no-safety-gear"
+        0: "Person",
+        1: "Head",
+        2: "Face",
+        3: "Glasses",
+        4: "Face-Mask-Medical",
+        5: "Face-Shield",
+        6: "Ear",
+        7: "Earmuffs",
+        8: "Hands",
+        9: "Gloves",
+        10: "Foot",
+        11: "Shoes",
+        12: "Safety-Vest",
+        13: "Tools",
+        14: "Helmet",
+        15: "Medical-Suit",
+        16: "Safety-Suit"
     }
     
     def __init__(
