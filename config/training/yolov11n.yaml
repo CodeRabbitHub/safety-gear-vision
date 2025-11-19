@@ -44,7 +44,7 @@ copy_paste: 0.0     # Segment copy-paste (probability)
 # Training settings
 patience: 50       # Early stopping patience (epochs)
 save_period: -1    # Save checkpoint every N epochs
-amp: true          # Automatic Mixed Precision training
+amp: false          # Automatic Mixed Precision training
 deterministic: false
 single_cls: false
 rect: false
