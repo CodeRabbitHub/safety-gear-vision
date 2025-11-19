@@ -2,6 +2,7 @@
 Training orchestrator for YOLOv11 models.
 """
 
+import os
 from pathlib import Path
 from typing import Union, Optional, Dict
 from datetime import datetime
@@ -95,24 +96,52 @@ class YOLOTrainer:
             self.logger.info(f"Using GPU: {gpu_info['devices'][0]['name']}")
         
         # Initialize model
-        model_weights = self.config.get('model', 'yolov11n.pt')
+        model_weights = self.config.get('model', 'yolov11s.pt')
+        self.logger.info(f"Config file loaded: {self.config_manager.config_path}")
         self.logger.info(f"Loading model: {model_weights}")
+        self.logger.info(f"Full config: {self.config}")
         
         # Ensure models/pretrained directory exists
         pretrained_dir = self.project_root / 'models' / 'pretrained'
         FileHandler.ensure_dir(pretrained_dir)
         
-        # Check if model exists in models/pretrained directory
+        # Set YOLO directories to prevent downloads to random locations
+        os.environ['YOLO_HOME'] = str(pretrained_dir)
+        os.environ['YOLO_CONFIG_DIR'] = str(self.project_root / 'config')
+        
+        # Check if model exists in models/pretrained directory BEFORE trying to load
         pretrained_model = pretrained_dir / model_weights
         
+        if not pretrained_model.exists():
+            self.logger.error(f"❌ Model not found: {pretrained_model}")
+            self.logger.error(f"")
+            self.logger.error(f"Please download models first using:")
+            self.logger.error(f"  poetry run python scripts/00_download_models.py")
+            self.logger.error(f"")
+            self.logger.error(f"Available models in {pretrained_dir}:")
+            if pretrained_dir.exists():
+                models = list(pretrained_dir.glob('*.pt'))
+                if models:
+                    for model_file in sorted(models):
+                        self.logger.error(f"  - {model_file.name}")
+                else:
+                    self.logger.error(f"  (no models found)")
+            raise FileNotFoundError(f"Model file not found: {pretrained_model}")
+        
         try:
-            if pretrained_model.exists():
-                self.logger.info(f"Loading from local pretrained models: {pretrained_model}")
-                self.model = YOLO(str(pretrained_model))
-            else:
-                self.logger.error(f"Model not found in {pretrained_model}")
-                self.logger.error(f"Please download models first: poetry run python scripts/00_download_models.py")
-                raise FileNotFoundError(f"Model file not found: {pretrained_model}")
+            self.logger.info(f"✓ Loading model from: {pretrained_model}")
+            # Use full path to prevent YOLO from trying to download
+            self.model = YOLO(str(pretrained_model.absolute()))
+            
+            # Check if YOLO accidentally downloaded a model to current directory
+            cwd_models = list(Path.cwd().glob('yolov*.pt'))
+            if cwd_models:
+                self.logger.warning(f"⚠️ WARNING: YOLO downloaded models to current directory!")
+                for model_file in cwd_models:
+                    self.logger.warning(f"  Found: {model_file}")
+                    self.logger.warning(f"  Moving to: {pretrained_dir / model_file.name}")
+                    model_file.rename(pretrained_dir / model_file.name)
+                    
         except Exception as e:
             self.logger.error(f"Failed to load model: {e}")
             raise
@@ -215,7 +244,7 @@ class YOLOTrainer:
             'patience': self.config.get('patience', 50),
             'save_period': self.config.get('save_period', 10),
             'workers': self.config.get('workers', 8),
-            'amp': self.config.get('amp', True),  # Mixed precision
+            'amp': self.config.get('amp', False),  # Disabled by default to prevent auto-downloads during AMP checks
             'plots': True,
             'verbose': True
         }

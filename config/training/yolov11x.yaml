@@ -44,7 +44,7 @@ copy_paste: 0.0
 # Training settings
 patience: 50
 save_period: -1
-amp: true
+amp: false
 deterministic: false
 single_cls: false
 rect: false
