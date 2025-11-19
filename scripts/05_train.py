@@ -69,8 +69,8 @@ def main():
     parser.add_argument(
         '--project',
         type=str,
-        default='models/checkpoints',
-        help='Project directory for saving results'
+        default=None,
+        help='Project directory for saving results (default: logs/tensorboard)'
     )
     
     args = parser.parse_args()
@@ -78,7 +78,7 @@ def main():
     # Setup paths
     config_path = project_root / args.config
     data_yaml = project_root / args.data
-    project_dir = project_root / args.project
+    project_dir = project_root / args.project if args.project else None
     
     # Initialize logger
     logger = get_logger('train', log_dir=project_root / 'logs')

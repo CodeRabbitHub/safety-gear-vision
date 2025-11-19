@@ -95,20 +95,24 @@ class YOLOTrainer:
             self.logger.info(f"Using GPU: {gpu_info['devices'][0]['name']}")
         
         # Initialize model
-        model_weights = self.config.get('model', 'yolov8s.pt')
+        model_weights = self.config.get('model', 'yolov11n.pt')
         self.logger.info(f"Loading model: {model_weights}")
         
+        # Ensure models/pretrained directory exists
+        pretrained_dir = self.project_root / 'models' / 'pretrained'
+        FileHandler.ensure_dir(pretrained_dir)
+        
         # Check if model exists in models/pretrained directory
-        pretrained_model = self.project_root / 'models' / 'pretrained' / model_weights
+        pretrained_model = pretrained_dir / model_weights
         
         try:
             if pretrained_model.exists():
                 self.logger.info(f"Loading from local pretrained models: {pretrained_model}")
                 self.model = YOLO(str(pretrained_model))
             else:
-                # Fall back to Ultralytics auto-download
-                self.logger.info(f"Model not found in {pretrained_model}, attempting to download...")
-                self.model = YOLO(model_weights)
+                self.logger.error(f"Model not found in {pretrained_model}")
+                self.logger.error(f"Please download models first: poetry run python scripts/00_download_models.py")
+                raise FileNotFoundError(f"Model file not found: {pretrained_model}")
         except Exception as e:
             self.logger.error(f"Failed to load model: {e}")
             raise
