@@ -29,7 +29,7 @@ def main():
         '--source',
         type=str,
         required=True,
-        help='Path to image or directory of images'
+        help='Path to image, video, or directory of images'
     )
     parser.add_argument(
         '--output-dir',
@@ -64,6 +64,11 @@ def main():
         '--save-json',
         action='store_true',
         help='Save predictions as JSON'
+    )
+    parser.add_argument(
+        '--save-frames',
+        action='store_true',
+        help='Save individual video frames (video only)'
     )
     
     args = parser.parse_args()
@@ -109,8 +114,66 @@ def main():
     )
     
     try:
+        # Determine source type
+        is_video = source_path.is_file() and source_path.suffix.lower() in ['.mp4', '.avi', '.mov', '.mkv', '.webm']
+        
         # Run inference
-        if source_path.is_file():
+        if is_video:
+            # Video processing
+            logger.info("Running inference on video...")
+            
+            output_video_path = None
+            if args.save_results:
+                output_video_path = output_dir / f"pred_{source_path.name}"
+            
+            frames_dir = None
+            if args.save_frames:
+                frames_dir = output_dir / 'frames' / source_path.stem
+            
+            results = predictor.predict_video(
+                video_path=source_path,
+                output_path=output_video_path,
+                save_frames=args.save_frames,
+                frames_dir=frames_dir,
+                show_progress=True
+            )
+            
+            # Print results
+            print("\n" + "="*60)
+            print("VIDEO PREDICTION RESULTS")
+            print("="*60)
+            print(f"Video: {results['video_path']}")
+            print(f"Total frames: {results['total_frames']}")
+            print(f"FPS: {results['fps']}")
+            print(f"Resolution: {results['resolution'][0]}x{results['resolution'][1]}")
+            print(f"Total detections: {results['total_detections']}")
+            
+            print("\nClass distribution:")
+            for class_name, count in results['class_counts'].items():
+                if count > 0:
+                    print(f"  {class_name}: {count}")
+            
+            if output_video_path:
+                print(f"\nOutput video: {output_video_path}")
+            
+            print("="*60)
+            
+            if args.save_json:
+                json_path = output_dir / f"{source_path.stem}_predictions.json"
+                FileHandler.ensure_dir(output_dir)
+                # Save without frame-by-frame predictions to keep file size manageable
+                summary = {
+                    'video_path': results['video_path'],
+                    'total_frames': results['total_frames'],
+                    'fps': results['fps'],
+                    'resolution': results['resolution'],
+                    'total_detections': results['total_detections'],
+                    'class_counts': results['class_counts']
+                }
+                FileHandler.write_json(summary, json_path)
+                logger.info(f"Summary saved to: {json_path}")
+        
+        elif source_path.is_file():
             # Single image
             logger.info("Running inference on single image...")
             

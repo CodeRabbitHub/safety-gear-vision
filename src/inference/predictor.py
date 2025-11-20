@@ -310,3 +310,136 @@ class YOLOPredictor:
                 class_counts[class_name] += 1
         
         return class_counts
+    
+    def predict_video(
+        self,
+        video_path: Union[str, Path],
+        output_path: Optional[Union[str, Path]] = None,
+        save_frames: bool = False,
+        frames_dir: Optional[Path] = None,
+        show_progress: bool = True
+    ) -> Dict:
+        """
+        Run prediction on video file.
+        
+        Args:
+            video_path: Path to input video
+            output_path: Path to save annotated video (optional)
+            save_frames: Whether to save individual frames
+            frames_dir: Directory to save frames (if save_frames=True)
+            show_progress: Show progress bar
+        
+        Returns:
+            Dictionary with video processing results
+        """
+        video_path = Path(video_path)
+        
+        if not video_path.exists():
+            raise FileNotFoundError(f"Video not found: {video_path}")
+        
+        # Open video
+        cap = cv2.VideoCapture(str(video_path))
+        
+        if not cap.isOpened():
+            raise ValueError(f"Could not open video: {video_path}")
+        
+        # Get video properties
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        
+        self.logger.info(f"Video properties: {width}x{height} @ {fps} fps, {total_frames} frames")
+        
+        # Setup video writer if output path provided
+        writer = None
+        if output_path:
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            writer = cv2.VideoWriter(
+                str(output_path),
+                fourcc,
+                fps,
+                (width, height)
+            )
+        
+        # Setup frames directory if needed
+        if save_frames and frames_dir:
+            frames_dir = Path(frames_dir)
+            frames_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Process video
+        frame_predictions = []
+        frame_idx = 0
+        
+        pbar = tqdm(total=total_frames, desc="Processing video") if show_progress else None
+        
+        try:
+            while True:
+                ret, frame = cap.read()
+                
+                if not ret:
+                    break
+                
+                # Run inference on frame
+                results = self.model.predict(
+                    source=frame,
+                    conf=self.conf_threshold,
+                    iou=self.iou_threshold,
+                    verbose=False
+                )[0]
+                
+                # Parse results
+                predictions = self._parse_results(results)
+                predictions['frame_idx'] = frame_idx
+                frame_predictions.append(predictions)
+                
+                # Draw predictions on frame
+                annotated_frame = self._draw_predictions(frame, predictions)
+                
+                # Write to output video
+                if writer:
+                    writer.write(annotated_frame)
+                
+                # Save frame if requested
+                if save_frames and frames_dir:
+                    frame_filename = frames_dir / f"frame_{frame_idx:06d}.jpg"
+                    cv2.imwrite(str(frame_filename), annotated_frame)
+                
+                frame_idx += 1
+                
+                if pbar:
+                    pbar.update(1)
+        
+        finally:
+            cap.release()
+            if writer:
+                writer.release()
+            if pbar:
+                pbar.close()
+        
+        # Compile results
+        results_dict = {
+            'video_path': str(video_path),
+            'output_path': str(output_path) if output_path else None,
+            'total_frames': frame_idx,
+            'fps': fps,
+            'resolution': (width, height),
+            'frame_predictions': frame_predictions,
+            'total_detections': sum(pred['num_detections'] for pred in frame_predictions)
+        }
+        
+        # Get aggregated class counts
+        all_class_counts = {name: 0 for name in self.CLASS_NAMES.values()}
+        for pred in frame_predictions:
+            for det in pred['detections']:
+                class_name = det['class_name']
+                all_class_counts[class_name] += 1
+        
+        results_dict['class_counts'] = all_class_counts
+        
+        self.logger.info(f"Processed {frame_idx} frames, {results_dict['total_detections']} total detections")
+        
+        return results_dict

@@ -87,12 +87,11 @@ def main():
     # Load model
     logger.info("Loading model...")
     try:
-        model = ModelUtils.load_model(weights_path)
+        from ultralytics import YOLO
+        model = YOLO(str(weights_path))
         
-        # Get model info
-        info = ModelUtils.get_model_info(model)
-        logger.info(f"Model type: {info['model_type']}")
-        logger.info(f"Parameters: {info['total_parameters']:,}")
+        # Get model info (basic)
+        logger.info(f"Model loaded: {weights_path.name}")
         
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
@@ -103,6 +102,7 @@ def main():
     
     try:
         export_kwargs = {
+            'format': args.format,
             'imgsz': args.imgsz,
             'half': args.half,
         }
@@ -112,31 +112,37 @@ def main():
             export_kwargs['dynamic'] = args.dynamic
             export_kwargs['simplify'] = args.simplify
         
-        # Generate output filename
+        # Export using YOLO's built-in export
+        exported_path = model.export(**export_kwargs)
+        
+        logger.info(f"Model exported to: {exported_path}")
+        
+        # Move to production directory if different
+        exported_path = Path(exported_path)
         model_name = weights_path.stem
         
-        exported_path = ModelUtils.export_model(
-            model=model,
-            export_format=args.format,
-            **export_kwargs
-        )
+        # Determine final path based on format
+        if args.format in ['pb', 'saved_model']:
+            final_path = output_dir / f"{model_name}_{args.format}"
+        else:
+            # Get the actual extension from exported file
+            final_path = output_dir / f"{model_name}{exported_path.suffix}"
         
-        # Move to output directory
-        final_path = output_dir / f"{model_name}.{args.format}"
-        if args.format == 'engine':
-            final_path = output_dir / f"{model_name}.engine"
-        elif args.format in ['pb', 'saved_model']:
-            final_path = output_dir / model_name
-        
-        # Move exported model
-        if Path(exported_path).exists():
+        # Move if not already in output directory
+        if exported_path.parent != output_dir:
             import shutil
-            if Path(exported_path).is_dir():
+            if exported_path.is_dir():
                 if final_path.exists():
                     shutil.rmtree(final_path)
                 shutil.move(str(exported_path), str(final_path))
             else:
+                if final_path.exists():
+                    final_path.unlink()
                 shutil.move(str(exported_path), str(final_path))
+            
+            logger.info(f"Moved to: {final_path}")
+        else:
+            final_path = exported_path
         
         # Print results
         print("\n" + "="*60)
@@ -147,8 +153,13 @@ def main():
         
         # Get file size
         if final_path.is_file():
-            size_mb = ModelUtils.get_model_size(final_path)
+            size_mb = final_path.stat().st_size / (1024 * 1024)
             print(f"Model size: {size_mb:.2f} MB")
+        elif final_path.is_dir():
+            # Calculate directory size
+            total_size = sum(f.stat().st_size for f in final_path.rglob('*') if f.is_file())
+            size_mb = total_size / (1024 * 1024)
+            print(f"Model size: {size_mb:.2f} MB (directory)")
         
         print("="*60)
         
