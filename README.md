@@ -11,8 +11,6 @@ A production-grade computer vision system for detecting Personal Protective Equi
 
 > **📖 New to this project?** See [QUICKSTART.md](QUICKSTART.md) for the fastest path to get started!
 
-> **📖 New to this project?** See [QUICKSTART.md](QUICKSTART.md) for the fastest path to get started!
-
 ## 🎯 Project Overview
 
 This system detects and classifies people and PPE items using 17 safety-gear classes (see `data/processed/dataset.yaml`):
