@@ -1,25 +1,97 @@
-.
-./config
-./config/training
-./data
-./data/{raw
-./data/{raw/{images,labels},processed
-./data/{raw/{images,labels},processed/{images
-./data/{raw/{images,labels},processed/{images/{train,val,test},labels
-./data/{raw/{images,labels},processed/{images/{train,val,test},labels/{train,val,test}}}
-./docs
-./logs
-./models
-./models/{pretrained,checkpoints,production}
-./notebooks
-./results
-./results/{experiments,evaluations,predictions}
-./scripts
-./src
-./src/data
-./src/evaluation
-./src/inference
-./src/training
-./src/utils
-./src/{data,training,inference,evaluation,utils}
-./tests
+safety-gear-vision/
+├── config/
+│   └── training/
+│       ├── yolov11n.yaml
+│       ├── yolov11s.yaml
+│       ├── yolov11m.yaml
+│       ├── yolov11l.yaml
+│       └── yolov11x.yaml
+├── data/
+│   ├── raw/
+│   │   ├── images/
+│   │   └── labels/
+│   └── processed/
+│       ├── images/
+│       │   ├── train/
+│       │   ├── val/
+│       │   └── test/
+│       ├── labels/
+│       │   ├── train/
+│       │   ├── val/
+│       │   └── test/
+│       └── dataset.yaml
+├── docs/
+│   ├── SETUP.md
+│   ├── TRAINING.md
+│   ├── INFERENCE.md
+│   ├── TENSORBOARD.md
+│   └── TROUBLESHOOTING.md
+├── logs/
+│   └── tensorboard/
+│       └── exp_20251118_114655/
+├── models/
+│   ├── pretrained/
+│   │   ├── yolo11n.pt
+│   │   ├── yolo11s.pt
+│   │   ├── yolo11m.pt
+│   │   ├── yolo11l.pt
+│   │   └── yolo11x.pt
+│   ├── checkpoints/
+│   │   └── exp_20251118_114655/
+│   │       └── weights/
+│   │           ├── best.pt
+│   │           └── last.pt
+│   └── production/
+├── notebooks/
+├── results/
+│   ├── experiments/
+│   ├── evaluations/
+│   ├── predictions/
+│   └── test_predictions/
+├── runs/
+│   └── detect/
+│       └── val/
+├── scripts/
+│   ├── 00_download_models.py
+│   ├── 01_setup_project.py
+│   ├── 02_validate_data.py
+│   ├── 03_prepare_dataset.py
+│   ├── 04_analyze_dataset.py
+│   ├── 05_train.py
+│   ├── 06_evaluate.py
+│   ├── 07_inference.py
+│   ├── 08_export_model.py
+│   └── 09_tensorboard.py
+├── src/
+│   ├── __init__.py
+│   ├── data/
+│   │   ├── __init__.py
+│   │   ├── data_validator.py
+│   │   ├── dataset_analyzer.py
+│   │   └── dataset_splitter.py
+│   ├── evaluation/
+│   │   ├── __init__.py
+│   │   └── evaluator.py
+│   ├── inference/
+│   │   ├── __init__.py
+│   │   └── predictor.py
+│   ├── training/
+│   │   ├── __init__.py
+│   │   └── trainer.py
+│   └── utils/
+│       ├── __init__.py
+│       ├── config_manager.py
+│       ├── file_handler.py
+│       ├── logger.py
+│       └── model_utils.py
+├── tests/
+│   └── __init__.py
+├── .gitignore
+├── .python-version
+├── BUILD_SUMMARY.md
+├── FOLDER_STRUCTURE.md
+├── PROJECT_STRUCTURE.txt
+├── QUICKSTART.md
+├── README.md
+├── poetry.lock
+└── pyproject.toml

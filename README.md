@@ -2,9 +2,11 @@
 
 A production-grade computer vision system for detecting Personal Protective Equipment (PPE) compliance using YOLOv11.
 
+> **📖 New to this project?** See [QUICKSTART.md](QUICKSTART.md) for the fastest path to get started!
+
 ## 🎯 Project Overview
 
-This system detects and classifies people and PPE items using the project's 17 safety-gear classes (see `data/processed/dataset.yaml`):
+This system detects and classifies people and PPE items using 17 safety-gear classes (see `data/processed/dataset.yaml`):
 
 - `0` : Person
 - `1` : Head
@@ -23,6 +25,8 @@ This system detects and classifies people and PPE items using the project's 17 s
 - `14`: Helmet
 - `15`: Medical-Suit
 - `16`: Safety-Suit
+
+**Current Status:** ✅ Fully tested and production-ready with trained YOLOv11s model
 
 ## 📋 Features
 
@@ -83,16 +87,17 @@ poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --experiment-name safety_gear_v1 \
     --epochs 200 \
-    --batch-size 16 \
-    --device 0
+    --batch-size 24 \
+    --device cpu  # or 0 for GPU
 
 # Optional: run inside tmux/screen if training remotely
 ```
 
 Notes:
 - The trainer expects pretrained weights in `models/pretrained/` (script `00_download_models.py` places them there).
-- Training logs and checkpoints are written to `logs/tensorboard/{experiment_name}/` by default. The best model is saved at `logs/tensorboard/{experiment_name}/weights/best.pt`.
-- AMP (automatic mixed precision) is disabled by default in configs to avoid an automatic AMP check that downloads a small model; enable `amp: true` in your chosen config if you explicitly want AMP.
+- Training outputs are written to `runs/detect/{experiment_name}/` by default (YOLO standard structure).
+- The best model is saved at `runs/detect/{experiment_name}/weights/best.pt`.
+- AMP (automatic mixed precision) is enabled by default; set `amp: false` in config if needed.
 
 ### 4. Evaluate Model
 
@@ -100,11 +105,11 @@ Example (use the `best.pt` produced by training):
 
 ```bash
 poetry run python scripts/06_evaluate.py \
-    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
+    --weights runs/detect/safety_gear_v1/weights/best.pt \
     --data data/processed/dataset.yaml
 ```
 
-If you don't know the exact experiment name, list the `logs/tensorboard/` folder and pick the latest experiment.
+If you don't know the exact experiment name, list the `runs/detect/` or `models/checkpoints/` folders and pick the latest experiment.
 
 ### 5. Run Inference
 
@@ -113,14 +118,16 @@ Run inference with a trained model (point `--weights` to the `best.pt` saved by 
 ```bash
 # Single image
 poetry run python scripts/07_inference.py \
-    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source path/to/image.jpg \
+    --output-dir results/predictions \
     --save-results
 
 # Batch processing
 poetry run python scripts/07_inference.py \
-    --weights logs/tensorboard/safety_gear_v1/weights/best.pt \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source path/to/images/ \
+    --output-dir results/predictions \
     --save-results \
     --save-json
 ```
@@ -179,15 +186,19 @@ Edit `config/training/yolov11s.yaml` to adjust:
 
 ### TensorBoard
 
-Start TensorBoard pointing it at the `logs/tensorboard/` directory:
+Start TensorBoard to monitor training:
 
 ```bash
-# Run locally on the machine where training produced logs
+# Use the integrated launcher (auto-finds latest run and converts CSV to TensorBoard)
 poetry run python scripts/09_tensorboard.py
-# or use tensorboard directly
-tensorboard --logdir logs/tensorboard --port 6006
 
-# If remote, forward port and open browser at http://localhost:6006
+# Or manually specify directory
+tensorboard --logdir runs/detect --port 6006
+# For older runs:
+tensorboard --logdir models/checkpoints --port 6006
+
+# Access at: http://localhost:6006
+# If remote, forward port: ssh -L 6006:localhost:6006 user@server
 ```
 
 ### GPU Monitoring
@@ -257,5 +268,6 @@ For questions or issues, please open a GitHub issue or contact [amanroland@gmail
 
 ---
 
-**Last Updated**: 2025-01-16
+**Last Updated**: 2025-11-21
 **Version**: 1.0.0
+**Status**: ✅ Fully Tested & Production Ready

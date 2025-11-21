@@ -39,15 +39,15 @@ ls /usr/local/cuda/
 **Solutions:**
 
 ```bash
-# Verify conda environment
-conda activate yolo
-conda list | grep ultralytics
+# Verify Poetry environment
+poetry shell
+poetry show ultralytics
 
 # Reinstall
-pip install ultralytics
+poetry add ultralytics
 
-# Or from requirements
-pip install -r requirements.txt
+# Or reinstall all dependencies
+poetry install
 ```
 
 ## Training Issues
@@ -60,17 +60,17 @@ pip install -r requirements.txt
 
 1. Reduce batch size:
 ```bash
-python scripts/05_train.py --batch-size 8  # or 4
+poetry run python scripts/05_train.py --batch-size 8  # or 4
 ```
 
 2. Reduce image size:
 ```bash
-python scripts/05_train.py --imgsz 512
+poetry run python scripts/05_train.py --imgsz 512
 ```
 
 3. Use smaller model:
 ```bash
-python scripts/05_train.py --config config/training/yolov11n.yaml
+poetry run python scripts/05_train.py --config config/training/yolov11n.yaml
 ```
 
 4. Clear GPU memory:
@@ -98,7 +98,7 @@ watch -n 1 nvidia-smi
 1. Use tmux to prevent SSH disconnections:
 ```bash
 tmux new -s training
-python scripts/05_train.py ...
+poetry run python scripts/05_train.py ...
 # Detach: Ctrl+b, d
 ```
 
@@ -109,7 +109,7 @@ tail -f logs/train_*.log
 
 3. Resume from checkpoint:
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --resume models/checkpoints/exp/weights/last.pt
 ```
 
@@ -121,8 +121,8 @@ python scripts/05_train.py \
 
 1. Check data quality:
 ```bash
-python scripts/02_validate_data.py
-python scripts/04_analyze_dataset.py
+poetry run python scripts/02_validate_data.py
+poetry run python scripts/04_analyze_dataset.py
 ```
 
 2. Verify class distribution (should be balanced)
@@ -181,7 +181,7 @@ from torch.utils.data import DataLoader
 
 ### Validation Errors
 
-**Problem:** `python scripts/02_validate_data.py` shows errors
+**Problem:** `poetry run python scripts/02_validate_data.py` shows errors
 
 **Common Issues:**
 
@@ -259,7 +259,7 @@ rename 'y/A-Z/a-z/' *.jpg
 
 3. Verify model performance:
 ```bash
-python scripts/06_evaluate.py ...
+poetry run python scripts/06_evaluate.py ...
 ```
 
 ### Too Many False Positives
@@ -415,7 +415,7 @@ ssh remote "cd ~/path && tar -xzf images.tar.gz"
 
 4. Export to TensorRT:
 ```bash
-python scripts/08_export_model.py --format engine
+poetry run python scripts/08_export_model.py --format engine
 ```
 
 5. Batch processing:

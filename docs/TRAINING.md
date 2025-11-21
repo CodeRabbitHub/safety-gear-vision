@@ -14,7 +14,7 @@ Complete guide for training YOLOv11 models on safety gear detection.
 
 ```bash
 # Validate dataset integrity
-python scripts/02_validate_data.py
+poetry run python scripts/02_validate_data.py
 
 # Should output: ✓ Dataset is valid!
 ```
@@ -23,7 +23,7 @@ python scripts/02_validate_data.py
 
 ```bash
 # Analyze class distribution and image statistics
-python scripts/04_analyze_dataset.py
+poetry run python scripts/04_analyze_dataset.py
 ```
 
 Review the analysis to check for:
@@ -35,10 +35,10 @@ Review the analysis to check for:
 
 ```bash
 # Split into train/val/test (80/15/5)
-python scripts/03_prepare_dataset.py
+poetry run python scripts/03_prepare_dataset.py
 
 # Custom split ratios
-python scripts/03_prepare_dataset.py --split-ratio 0.7 0.2 0.1
+poetry run python scripts/03_prepare_dataset.py --split-ratio 0.7 0.2 0.1
 ```
 
 This creates `data/processed/dataset.yaml` needed for training.
@@ -49,7 +49,7 @@ This creates `data/processed/dataset.yaml` needed for training.
 
 ```bash
 # Start training with default config
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --experiment-name my_first_model
 ```
@@ -57,7 +57,7 @@ python scripts/05_train.py \
 ### Full Training Command
 
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --data data/processed/dataset.yaml \
     --experiment-name safety_gear_v1 \
@@ -76,7 +76,7 @@ Tmux keeps training running after SSH disconnect:
 tmux new -s yolo-training
 
 # Start training
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --experiment-name safety_gear_v1
 
@@ -93,7 +93,7 @@ tmux kill-session -t yolo-training
 
 ### YOLOv11n (Nano) - Fastest
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11n.yaml \
     --batch-size 32  # Can use larger batch
 ```
@@ -104,7 +104,7 @@ python scripts/05_train.py \
 
 ### YOLOv11s (Small) - Recommended
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --batch-size 16
 ```
@@ -115,7 +115,7 @@ python scripts/05_train.py \
 
 ### YOLOv11m (Medium) - Higher Accuracy
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11m.yaml \
     --batch-size 12  # Reduced for T4
 ```
@@ -126,7 +126,7 @@ python scripts/05_train.py \
 
 ### YOLOv11l (Large) - Very High Accuracy
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11l.yaml \
     --batch-size 8  # Further reduced for T4
 ```
@@ -137,7 +137,7 @@ python scripts/05_train.py \
 
 ### YOLOv11x (Extra-Large) - Maximum Accuracy
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11x.yaml \
     --batch-size 4  # Minimal for T4
 ```
@@ -176,7 +176,7 @@ fliplr: 0.5         # Horizontal flip probability
 Override config without editing files:
 
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11s.yaml \
     --epochs 300 \           # Override
     --batch-size 12 \        # Override
@@ -227,7 +227,7 @@ cat models/checkpoints/safety_gear_v1/train.log
 If training stops, resume from last checkpoint:
 
 ```bash
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --resume models/checkpoints/safety_gear_v1/weights/last.pt \
     --data data/processed/dataset.yaml
 ```
@@ -237,7 +237,7 @@ python scripts/05_train.py \
 ### 1. Start Small
 ```bash
 # First, test with small dataset/epochs
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --config config/training/yolov11n.yaml \
     --epochs 10
 ```
@@ -368,7 +368,7 @@ model: models/pretrained/custom_weights.pt
 
 ```bash
 # Use multiple GPUs
-python scripts/05_train.py \
+poetry run python scripts/05_train.py \
     --device 0,1 \  # GPUs 0 and 1
     --batch-size 32
 ```

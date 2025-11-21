@@ -125,7 +125,7 @@ cd ~/projects/safety-gear-detection
 poetry shell
 
 # Run setup script
-python scripts/01_setup_project.py
+poetry run python scripts/01_setup_project.py
 ```
 
 This creates all necessary directories.
@@ -233,9 +233,9 @@ ls data/raw/labels/ | wc -l
 
 ## 9. Next Steps
 
-1. Validate data: `python scripts/02_validate_data.py`
-2. Analyze dataset: `python scripts/04_analyze_dataset.py`
-3. Prepare splits: `python scripts/03_prepare_dataset.py`
+1. Validate data: `poetry run python scripts/02_validate_data.py`
+2. Analyze dataset: `poetry run python scripts/04_analyze_dataset.py`
+3. Prepare splits: `poetry run python scripts/03_prepare_dataset.py`
 
 ## Troubleshooting
 
