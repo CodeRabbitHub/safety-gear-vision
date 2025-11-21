@@ -1,4 +1,16 @@
 safety-gear-vision/
+├── .gitignore
+├── .python-version
+├── BUILD_SUMMARY.md
+├── FOLDER_STRUCTURE.md
+├── PROJECT_STRUCTURE.txt
+├── QUICKSTART.md
+├── README.md
+├── START_HERE.md
+├── TENSORBOARD_SETUP.md
+├── poetry.lock
+├── pyproject.toml
+│
 ├── config/
 │   └── training/
 │       ├── yolov11n.yaml
@@ -6,6 +18,7 @@ safety-gear-vision/
 │       ├── yolov11m.yaml
 │       ├── yolov11l.yaml
 │       └── yolov11x.yaml
+│
 ├── data/
 │   ├── raw/
 │   │   ├── images/
@@ -20,37 +33,34 @@ safety-gear-vision/
 │       │   ├── val/
 │       │   └── test/
 │       └── dataset.yaml
+│
 ├── docs/
-│   ├── SETUP.md
-│   ├── TRAINING.md
 │   ├── INFERENCE.md
+│   ├── SETUP.md
 │   ├── TENSORBOARD.md
+│   ├── TRAINING.md
 │   └── TROUBLESHOOTING.md
+│
 ├── logs/
-│   └── tensorboard/
-│       └── exp_20251118_114655/
+│   └── (training and validation logs)
+│
 ├── models/
 │   ├── pretrained/
-│   │   ├── yolo11n.pt
-│   │   ├── yolo11s.pt
-│   │   ├── yolo11m.pt
-│   │   ├── yolo11l.pt
-│   │   └── yolo11x.pt
 │   ├── checkpoints/
-│   │   └── exp_20251118_114655/
-│   │       └── weights/
-│   │           ├── best.pt
-│   │           └── last.pt
 │   └── production/
+│
 ├── notebooks/
+│   └── (jupyter notebooks for experiments)
+│
 ├── results/
 │   ├── experiments/
 │   ├── evaluations/
-│   ├── predictions/
-│   └── test_predictions/
+│   └── predictions/
+│
 ├── runs/
 │   └── detect/
-│       └── val/
+│       └── (YOLO training outputs)
+│
 ├── scripts/
 │   ├── 00_download_models.py
 │   ├── 01_setup_project.py
@@ -62,6 +72,7 @@ safety-gear-vision/
 │   ├── 07_inference.py
 │   ├── 08_export_model.py
 │   └── 09_tensorboard.py
+│
 ├── src/
 │   ├── __init__.py
 │   ├── data/
@@ -84,14 +95,6 @@ safety-gear-vision/
 │       ├── file_handler.py
 │       ├── logger.py
 │       └── model_utils.py
-├── tests/
-│   └── __init__.py
-├── .gitignore
-├── .python-version
-├── BUILD_SUMMARY.md
-├── FOLDER_STRUCTURE.md
-├── PROJECT_STRUCTURE.txt
-├── QUICKSTART.md
-├── README.md
-├── poetry.lock
-└── pyproject.toml
+│
+└── tests/
+    └── __init__.py

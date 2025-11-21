@@ -1,6 +1,15 @@
 # Safety Gear Detection with YOLOv11
 
+[![Python Version](https://img.shields.io/badge/python-3.12.12-blue.svg)](https://www.python.org/downloads/)
+[![Poetry](https://img.shields.io/badge/poetry-dependency%20management-blue)](https://python-poetry.org/)
+[![YOLOv11](https://img.shields.io/badge/YOLOv11-Ultralytics-00FFFF)](https://github.com/ultralytics/ultralytics)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Status](https://img.shields.io/badge/status-production--ready-success)](BUILD_SUMMARY.md)
+
 A production-grade computer vision system for detecting Personal Protective Equipment (PPE) compliance using YOLOv11.
+
+> **📖 New to this project?** See [QUICKSTART.md](QUICKSTART.md) for the fastest path to get started!
 
 > **📖 New to this project?** See [QUICKSTART.md](QUICKSTART.md) for the fastest path to get started!
 
@@ -40,6 +49,13 @@ This system detects and classifies people and PPE items using 17 safety-gear cla
 - ✅ Model export (ONNX, TorchScript, TFLite)
 - ✅ Extensive logging and error handling
 
+## 📋 Requirements
+
+- **Python**: 3.12.12 (tested and verified)
+- **Poetry**: For dependency management
+- **CUDA**: 12.1+ (optional, for GPU training)
+- **GPU**: NVIDIA GPU with 8GB+ VRAM recommended (Tesla T4 or better)
+
 ## 🚀 Quick Start
 
 ### 1. Environment Setup
@@ -65,13 +81,13 @@ poetry run python scripts/01_setup_project.py
 # - Labels in data/raw/labels/ (YOLO format)
 
 # Validate data
-python scripts/02_validate_data.py
+poetry run python scripts/02_validate_data.py
 
 # Analyze dataset
-python scripts/04_analyze_dataset.py
+poetry run python scripts/04_analyze_dataset.py
 
 # Split into train/val/test
-python scripts/03_prepare_dataset.py
+poetry run python scripts/03_prepare_dataset.py
 ```
 
 ### 3. Train Model
@@ -89,15 +105,17 @@ poetry run python scripts/05_train.py \
     --epochs 200 \
     --batch-size 24 \
     --device cpu  # or 0 for GPU
+    --batch-size 24 \
+    --device cpu  # or 0 for GPU
 
 # Optional: run inside tmux/screen if training remotely
 ```
 
 Notes:
 - The trainer expects pretrained weights in `models/pretrained/` (script `00_download_models.py` places them there).
-- Training outputs are written to `runs/detect/{experiment_name}/` by default (YOLO standard structure).
-- The best model is saved at `runs/detect/{experiment_name}/weights/best.pt`.
-- AMP (automatic mixed precision) is enabled by default; set `amp: false` in config if needed.
+- Training outputs are written to `runs/detect/{experiment_name}/` (YOLO standard) or `models/checkpoints/{experiment_name}/`.
+- The best model is saved at `runs/detect/{experiment_name}/weights/best.pt` or `models/checkpoints/{experiment_name}/weights/best.pt`.
+- Early stopping is enabled with patience=50 to prevent overtraining.
 
 ### 4. Evaluate Model
 
@@ -106,9 +124,11 @@ Example (use the `best.pt` produced by training):
 ```bash
 poetry run python scripts/06_evaluate.py \
     --weights runs/detect/safety_gear_v1/weights/best.pt \
+    --weights runs/detect/safety_gear_v1/weights/best.pt \
     --data data/processed/dataset.yaml
 ```
 
+If you don't know the exact experiment name, list the `runs/detect/` or `models/checkpoints/` folders and pick the latest experiment.
 If you don't know the exact experiment name, list the `runs/detect/` or `models/checkpoints/` folders and pick the latest experiment.
 
 ### 5. Run Inference
@@ -118,14 +138,14 @@ Run inference with a trained model (point `--weights` to the `best.pt` saved by 
 ```bash
 # Single image
 poetry run python scripts/07_inference.py \
-    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
+    --weights runs/detect/safety_gear_v1/weights/best.pt \
     --source path/to/image.jpg \
     --output-dir results/predictions \
     --save-results
 
 # Batch processing
 poetry run python scripts/07_inference.py \
-    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
+    --weights runs/detect/safety_gear_v1/weights/best.pt \
     --source path/to/images/ \
     --output-dir results/predictions \
     --save-results \
@@ -186,18 +206,18 @@ Edit `config/training/yolov11s.yaml` to adjust:
 
 ### TensorBoard
 
-Start TensorBoard to monitor training:
+Start TensorBoard to monitor training metrics:
 
 ```bash
-# Use the integrated launcher (auto-finds latest run and converts CSV to TensorBoard)
+# Use the integrated launcher (auto-finds latest run and converts CSV)
 poetry run python scripts/09_tensorboard.py
 
-# Or manually specify directory
+# Or manually point to training outputs
 tensorboard --logdir runs/detect --port 6006
-# For older runs:
+# For older checkpoints:
 tensorboard --logdir models/checkpoints --port 6006
 
-# Access at: http://localhost:6006
+# Access at http://localhost:6006
 # If remote, forward port: ssh -L 6006:localhost:6006 user@server
 ```
 
@@ -223,10 +243,10 @@ Typical metrics will vary by model variant and dataset split. Example ranges:
 ### Out of Memory Errors
 ```bash
 # Reduce batch size
-python scripts/05_train.py --batch-size 8
+poetry run python scripts/05_train.py --batch-size 8
 
 # Or use smaller model
---config config/training/yolov11n.yaml
+poetry run python scripts/05_train.py --config config/training/yolov11n.yaml
 ```
 
 ### Slow Training
@@ -262,12 +282,16 @@ MIT License - see LICENSE file
 - [Ultralytics YOLOv11](https://github.com/ultralytics/ultralytics)
 - YOLO architecture by Joseph Redmon
 
-## 📧 Contact
+## 📧 Support & Contact
 
-For questions or issues, please open a GitHub issue or contact [amanroland@gmail.com]
+For questions, bug reports, or feature requests:
+- **Open a GitHub Issue**: [Report an issue](https://github.com/CodeRabbitHub/safety-gear-vision/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/CodeRabbitHub/safety-gear-vision/discussions)
+- **Documentation**: Check the [docs/](docs/) folder for detailed guides
 
 ---
 
-**Last Updated**: 2025-11-21
-**Version**: 1.0.0
+**Last Updated**: 2025-11-21  
+**Version**: 1.0.0  
+**Python**: 3.12.12  
 **Status**: ✅ Fully Tested & Production Ready
