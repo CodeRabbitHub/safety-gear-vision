@@ -131,6 +131,16 @@ poetry run python scripts/06_evaluate.py \
 If you don't know the exact experiment name, list the `runs/detect/` or `models/checkpoints/` folders and pick the latest experiment.
 If you don't know the exact experiment name, list the `runs/detect/` or `models/checkpoints/` folders and pick the latest experiment.
 
+### 5. Run Tests
+
+To verify the codebase functionality, run the unit tests:
+
+```bash
+poetry run pytest tests/ -v
+```
+
+See [docs/TESTING.md](docs/TESTING.md) for more details.
+
 ### 5. Run Inference
 
 Run inference with a trained model (point `--weights` to the `best.pt` saved by training):
