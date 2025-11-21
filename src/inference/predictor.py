@@ -69,7 +69,8 @@ class YOLOPredictor:
         conf_threshold: float = 0.5,
         iou_threshold: float = 0.45,
         device: Optional[str] = None,
-        logger=None
+        logger=None,
+        model: Optional[YOLO] = None
     ):
         """
         Initialize YOLO predictor.
@@ -80,6 +81,7 @@ class YOLOPredictor:
             iou_threshold: IoU threshold for NMS
             device: Device to run inference on
             logger: Logger instance
+            model: Optional YOLO model instance (for testing)
         """
         self.weights_path = Path(weights_path)
         self.conf_threshold = conf_threshold
@@ -89,7 +91,7 @@ class YOLOPredictor:
         # Load model
         self.logger.info(f"Loading model from: {self.weights_path}")
         self.device = ModelUtils.get_device(device)
-        self.model = ModelUtils.load_model(self.weights_path, self.device)
+        self.model = model or ModelUtils.load_model(self.weights_path, self.device)
         
         # Log model info
         model_info = ModelUtils.get_model_info(self.model)

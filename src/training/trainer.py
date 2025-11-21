@@ -22,7 +22,8 @@ class YOLOTrainer:
         self,
         config_path: Union[str, Path],
         experiment_name: Optional[str] = None,
-        logger=None
+        logger=None,
+        config_manager: Optional[ConfigManager] = None
     ):
         """
         Initialize YOLO trainer.
@@ -31,8 +32,9 @@ class YOLOTrainer:
             config_path: Path to training configuration file
             experiment_name: Name for this training experiment
             logger: Logger instance
+            config_manager: Optional ConfigManager instance (for testing)
         """
-        self.config_manager = ConfigManager(config_path)
+        self.config_manager = config_manager or ConfigManager(config_path)
         self.config = self.config_manager.to_dict()
         
         # Get project root
