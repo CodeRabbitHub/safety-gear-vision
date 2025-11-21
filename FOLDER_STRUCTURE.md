@@ -3,17 +3,25 @@
 ```
 safety-gear-detection/
 │
+├── 📄 START_HERE.md                 # ← READ THIS FIRST!
+├── 📄 BUILD_SUMMARY.md              # Complete build overview
+├── 📄 FOLDER_STRUCTURE.md           # This file - project organization
+├── 📄 PROJECT_STRUCTURE.txt         # Tree structure reference
+├── 📄 QUICKSTART.md                 # Fast start guide
 ├── 📄 README.md                     # Main documentation
-├── 📄 QUICKSTART.md                 # ← START HERE for fastest setup!
-├── 📄 BUILD_SUMMARY.md              # Complete testing report
-├── 📄 FOLDER_STRUCTURE.md           # This file - directory reference
-├── 📄 pyproject.toml                # Python dependencies
+├── 📄 TENSORBOARD_SETUP.md          # TensorBoard guide
+├── 📄 pyproject.toml                # Python dependencies (Poetry)
+├── 📄 poetry.lock                   # Locked dependencies
 ├── 📄 .gitignore                    # Git exclusions
+├── 📄 .python-version               # Python 3.12.12
 │
 ├── 📁 config/                       # Configuration files
 │   └── 📁 training/
 │       ├── yolov11n.yaml           # Nano model config (fastest)
-│       └── yolov11s.yaml           # Small model config (recommended)
+│       ├── yolov11s.yaml           # Small model config (recommended)
+│       ├── yolov11m.yaml           # Medium model config
+│       ├── yolov11l.yaml           # Large model config
+│       └── yolov11x.yaml           # Extra-large model config (best accuracy)
 │
 ├── 📁 data/                         # Data directory
 │   ├── 📁 raw/                     # Your original data goes here
@@ -59,7 +67,18 @@ safety-gear-detection/
 │   ├── validate_data_20250116.log
 │   └── ...
 │
-├── 📁 scripts/                      # Executable scripts (8 files)
+├── 📁 runs/                         # YOLO training outputs (default)
+│   └── 📁 detect/
+│       └── 📁 <experiment_name>/
+│           ├── 📁 weights/
+│           │   ├── best.pt         # Best model weights
+│           │   └── last.pt         # Latest checkpoint
+│           ├── results.csv         # Training metrics
+│           ├── confusion_matrix.png
+│           └── ...                 # Plots and visualizations
+│
+├── 📁 scripts/                      # Executable scripts (10 files)
+│   ├── 00_download_models.py       # Download pretrained YOLO models
 │   ├── 01_setup_project.py         # Initialize directory structure
 │   ├── 02_validate_data.py         # Validate dataset integrity
 │   ├── 03_prepare_dataset.py       # Split into train/val/test
@@ -67,7 +86,8 @@ safety-gear-detection/
 │   ├── 05_train.py                 # Train YOLOv11 model
 │   ├── 06_evaluate.py              # Evaluate model performance
 │   ├── 07_inference.py             # Run predictions
-│   └── 08_export_model.py          # Export to ONNX/TensorRT
+│   ├── 08_export_model.py          # Export to ONNX/TensorRT
+│   └── 09_tensorboard.py           # Launch TensorBoard monitoring
 │
 ├── 📁 src/                          # Source code modules
 │   ├── __init__.py
@@ -97,10 +117,11 @@ safety-gear-detection/
 │       ├── file_handler.py        # File I/O utilities
 │       └── model_utils.py         # YOLO model operations
 │
-├── 📁 docs/                         # Documentation
+├── 📁 docs/                         # Documentation (5 files)
 │   ├── SETUP.md                    # Environment setup guide
 │   ├── TRAINING.md                 # Complete training guide
 │   ├── INFERENCE.md                # Inference guide
+│   ├── TENSORBOARD.md              # TensorBoard monitoring guide
 │   └── TROUBLESHOOTING.md          # Common issues & fixes
 │
 ├── 📁 notebooks/                    # Jupyter notebooks (optional)
@@ -115,12 +136,12 @@ safety-gear-detection/
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| **Python Modules** | 16 | Core source code in `src/` |
+| **Python Modules** | 13 | Core source code in `src/` |
 | **Scripts** | 10 | Executable scripts in `scripts/` |
-| **Config Files** | 6 | YAML training configs (5 models + 1 dataset) |
+| **Config Files** | 5 | YAML training configs (n/s/m/l/x) |
 | **Documentation** | 9 | Markdown docs (README, guides, etc.) |
-| **Environment** | 1 | pyproject.toml (Poetry config) |
-| **Total Files** | 42+ | Complete production system |
+| **Environment** | 4 | pyproject.toml, poetry.lock, .gitignore, .python-version |
+| **Total Files** | 41 | Complete production system |
 
 ## 🎯 Key Directories Explained
 
@@ -169,12 +190,14 @@ scripts/07_inference.py
 ## 🚀 Workflow Through Folders
 
 ```
-1. Add data to data/raw/
-2. Run scripts/02_validate_data.py
-3. Run scripts/03_prepare_dataset.py → Creates data/processed/
-4. Run scripts/05_train.py → Creates models/checkpoints/
-5. Run scripts/06_evaluate.py → Creates results/evaluations/
-6. Run scripts/07_inference.py → Creates results/predictions/
+1. Run scripts/00_download_models.py → Downloads to models/pretrained/
+2. Add data to data/raw/
+3. Run scripts/02_validate_data.py
+4. Run scripts/03_prepare_dataset.py → Creates data/processed/
+5. Run scripts/05_train.py → Creates runs/detect/ or models/checkpoints/
+6. Run scripts/06_evaluate.py → Creates results/evaluations/
+7. Run scripts/07_inference.py → Creates results/predictions/
+8. Run scripts/09_tensorboard.py → Monitors runs/detect/
 ```
 
 ---
