@@ -3,10 +3,10 @@
 ```
 safety-gear-detection/
 │
-├── 📄 START_HERE.md                 # ← READ THIS FIRST!
-├── 📄 BUILD_SUMMARY.md              # Complete build overview
-├── 📄 QUICKSTART.md                 # Fast start guide
 ├── 📄 README.md                     # Main documentation
+├── 📄 QUICKSTART.md                 # ← START HERE for fastest setup!
+├── 📄 BUILD_SUMMARY.md              # Complete testing report
+├── 📄 FOLDER_STRUCTURE.md           # This file - directory reference
 ├── 📄 pyproject.toml                # Python dependencies
 ├── 📄 .gitignore                    # Git exclusions
 │
@@ -115,12 +115,12 @@ safety-gear-detection/
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| **Python Modules** | 13 | Core source code in `src/` |
-| **Scripts** | 8 | Executable scripts in `scripts/` |
-| **Config Files** | 2 | YAML training configs |
-| **Documentation** | 8 | Markdown docs (README, guides, etc.) |
-| **Environment** | 3 | requirements.txt, environment.yml, .gitignore |
-| **Total Files** | 34 | Complete production system |
+| **Python Modules** | 16 | Core source code in `src/` |
+| **Scripts** | 10 | Executable scripts in `scripts/` |
+| **Config Files** | 6 | YAML training configs (5 models + 1 dataset) |
+| **Documentation** | 9 | Markdown docs (README, guides, etc.) |
+| **Environment** | 1 | pyproject.toml (Poetry config) |
+| **Total Files** | 42+ | Complete production system |
 
 ## 🎯 Key Directories Explained
 

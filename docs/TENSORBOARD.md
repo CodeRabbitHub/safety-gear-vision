@@ -9,13 +9,18 @@ TensorBoard visualization is now integrated into the training pipeline for monit
 poetry run python scripts/05_train.py
 ```
 
-Training will automatically log metrics to `logs/tensorboard/{experiment_name}/events.out.tfevents.*`
+Training will automatically log metrics to `runs/detect/{experiment_name}/` or `models/checkpoints/{experiment_name}/`
 
 ### 2. Launch TensorBoard
 In a new terminal, run:
 ```bash
 poetry run python scripts/09_tensorboard.py
 ```
+
+This script will:
+- Auto-detect the latest training run
+- Convert CSV metrics to TensorBoard event files
+- Launch TensorBoard server
 
 ### 3. View Metrics
 Open your browser and go to: **http://localhost:6006**
@@ -51,27 +56,29 @@ TensorBoard automatically aggregates all experiments. You can:
 
 ## Directory Structure
 
-Training logs are automatically organized by experiment name:
+Training logs are automatically organized by YOLO:
 
 ```
-logs/
-└── tensorboard/
-    ├── exp_20251117_212154/
-    │   ├── events.out.tfevents.*
+runs/
+└── detect/
+    ├── exp_20251118_114655/
     │   ├── weights/
     │   │   ├── best.pt
     │   │   └── last.pt
-    │   └── args.yaml
-    ├── exp_20251117_213000/
-    │   ├── events.out.tfevents.*
-    │   ├── weights/
-    │   │   ├── best.pt
-    │   │   └── last.pt
-    │   └── args.yaml
+    │   ├── results.csv
+    │   └── results.png
     └── ...
+
+models/
+└── checkpoints/
+    └── exp_20251118_114655/
+        ├── weights/
+        │   ├── best.pt
+        │   └── last.pt
+        └── results.csv
 ```
 
-The `setup_project.py` script creates the `logs/` directory. The `logs/tensorboard/` subdirectory and experiment folders are created automatically during training.
+The `scripts/09_tensorboard.py` script automatically searches these directories and converts `results.csv` to TensorBoard-compatible event files.
 
 ## Stopping TensorBoard
 
@@ -81,24 +88,29 @@ Press `Ctrl+C` in the terminal running TensorBoard.
 
 **"No TensorBoard event files found"**
 - Make sure training has completed at least one epoch
-- Check that `logs/tensorboard/` directory exists
+- Check that `runs/detect/` or `models/checkpoints/` directory exists
+- Run `poetry run python scripts/09_tensorboard.py` to auto-convert CSV files
 - Run training first: `poetry run python scripts/05_train.py`
 
 **"Port 6006 already in use"**
 - TensorBoard is already running in another terminal
 - Stop the existing instance first with `Ctrl+C`
-- Or use a different port: `tensorboard --logdir logs/tensorboard --port 6007`
+- Or use a different port: `tensorboard --logdir runs/detect --port 6007`
 
 ## Advanced Usage
 
 ### Custom Port
 ```bash
-tensorboard --logdir logs/tensorboard --port 8080
+tensorboard --logdir runs/detect --port 8080
+# Or for older checkpoints:
+tensorboard --logdir models/checkpoints --port 8080
 ```
 
 ### Remote Access
 ```bash
-tensorboard --logdir logs/tensorboard --host 0.0.0.0 --port 6006
+tensorboard --logdir runs/detect --host 0.0.0.0 --port 6006
+# Or:
+tensorboard --logdir models/checkpoints --host 0.0.0.0 --port 6006
 ```
 Then access from another machine: `http://YOUR_IP:6006`
 
@@ -107,7 +119,7 @@ To add custom metrics in training scripts:
 ```python
 from torch.utils.tensorboard import SummaryWriter
 
-writer = SummaryWriter('logs/tensorboard/custom')
+writer = SummaryWriter('runs/detect/custom_experiment')
 writer.add_scalar('custom/metric_name', value, step)
 writer.flush()
 ```

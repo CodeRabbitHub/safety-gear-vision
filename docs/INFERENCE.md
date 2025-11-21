@@ -16,8 +16,8 @@ The inference system supports:
 ### Single Image
 
 ```bash
-python scripts/07_inference.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/07_inference.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source path/to/image.jpg \
     --save-results
 ```
@@ -30,8 +30,8 @@ Output:
 ### Batch Processing
 
 ```bash
-python scripts/07_inference.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/07_inference.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source path/to/images/ \
     --save-results \
     --save-json
@@ -46,8 +46,8 @@ Processes all images in directory and saves:
 ### Confidence Threshold
 
 ```bash
-python scripts/07_inference.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/07_inference.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source image.jpg \
     --conf-threshold 0.7  # Higher = fewer false positives
 ```
@@ -60,8 +60,8 @@ python scripts/07_inference.py \
 ### Custom Output Directory
 
 ```bash
-python scripts/07_inference.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/07_inference.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source images/ \
     --output-dir results/my_predictions \
     --save-results
@@ -149,8 +149,8 @@ Class distribution:
 
 ```bash
 # Process daily site images
-python scripts/07_inference.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/07_inference.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --source /path/to/site_cameras/ \
     --conf-threshold 0.6 \
     --save-results \
@@ -166,7 +166,7 @@ from src.inference.predictor import YOLOPredictor
 import cv2
 
 predictor = YOLOPredictor(
-    weights_path="models/production/safety_gear_v1.0.pt",
+    weights_path="models/checkpoints/exp_20251118_114655/weights/best.pt",
     conf_threshold=0.5
 )
 
@@ -194,7 +194,7 @@ from src.inference.predictor import YOLOPredictor
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-predictor = YOLOPredictor("models/production/safety_gear_v1.0.pt")
+predictor = YOLOPredictor("models/checkpoints/exp_20251118_114655/weights/best.pt")
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -222,12 +222,12 @@ def predict():
 # Split dataset and run multiple processes
 
 # GPU 0
-python scripts/07_inference.py \
+poetry run python scripts/07_inference.py \
     --source images_batch_1/ \
     --device 0 &
 
 # GPU 1
-python scripts/07_inference.py \
+poetry run python scripts/07_inference.py \
     --source images_batch_2/ \
     --device 1 &
 ```
@@ -237,8 +237,8 @@ python scripts/07_inference.py \
 Evaluate model performance on test set:
 
 ```bash
-python scripts/06_evaluate.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/06_evaluate.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --data data/processed/dataset.yaml \
     --split test
 ```
@@ -293,8 +293,8 @@ Results include:
 ### ONNX Export
 
 ```bash
-python scripts/08_export_model.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/08_export_model.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --format onnx \
     --imgsz 640
 ```
@@ -307,8 +307,8 @@ Benefits:
 ### TensorRT Export
 
 ```bash
-python scripts/08_export_model.py \
-    --weights models/production/safety_gear_v1.0.pt \
+poetry run python scripts/08_export_model.py \
+    --weights models/checkpoints/exp_20251118_114655/weights/best.pt \
     --format engine \
     --imgsz 640 \
     --half  # FP16 precision
